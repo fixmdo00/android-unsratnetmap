@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:padding="8dp"
+    android:orientation="vertical"
+    android:background="@color/black"
+    >
+
+    <Button
+        android:id="@+id/btnCariLokasiNow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cari Lokasi Saat Ini"
+        android:textAllCaps="false"
+        android:paddingBottom="5dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Koordinat Lokasi :"
+        android:textSize="16dp"
+        android:textColor="@color/white" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/txtKoordinatNow"
+        android:textSize="16dp"
+        android:textColor="@color/white"
+        />
+    <Button
+        android:id="@+id/btnScanWifi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan Wifi"
+        android:textAllCaps="false"
+        android:paddingBottom="5dp" />
+
+    <ListView
+        android:id="@+id/wifiList"
+        android:layout_width="match_parent"
+        android:layout_height="284dp"
+        android:layout_weight="0.97"
+        android:background="@color/teal_200"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SSID :"
+        android:textSize="16dp"
+        android:textColor="@color/white" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/txtSSID"
+        android:textSize="16dp"
+        android:textColor="@color/white"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="RSSI :"
+        android:textSize="16dp"
+        android:textColor="@color/white" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/txtRSSI"
+        android:textSize="16dp"
+        android:textColor="@color/white"
+        />
+
+
+    <Button
+        android:id="@+id/btnUpload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:text="Tambah ke Database"
+        android:textAllCaps="false" />
+
+
+</LinearLayout>
