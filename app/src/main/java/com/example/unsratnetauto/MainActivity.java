@@ -1,13 +1,9 @@
-package com.example.unsratnetmap;
+package com.example.unsratnetauto;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,7 +19,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -39,7 +34,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -121,7 +115,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else {
                     txtKoodinatNow.setText("Harap menunggu hingga lokasi" +
-                            "didapatkan atau cek pengaturan lokasi anda");
+                            " didapatkan atau cek pengaturan lokasi anda");
                 }
 
             }
@@ -159,8 +153,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if ( gSsid.isEmpty() && gRssi.isEmpty() && latitude.isEmpty() && longitude.isEmpty()){
-                    Toast.makeText(getApplicationContext(),"Data Tidak Lengkap", Toast.LENGTH_SHORT).show();
-                    return;
+
                 } else {
                     String sSsid = gSsid.toString();
                     String sRssi = gRssi.toString();
@@ -302,6 +295,7 @@ public class MainActivity extends AppCompatActivity
                 String hasil[] = {ssid,rssi};
                 arrayList2.add(hasil);
                 arrayList.add(scanResult.SSID + "  (" + scanResult.level + ")");
+                insertToDatabase(ssid,rssi,latitude,longitude);
                 adapter.notifyDataSetChanged();
             }
         }
