@@ -42,13 +42,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements LocationListener {
 
-    private TextView txtKoodinatNow, txtRssi, txtSsid;
-    private Button btnCariLokasiNow, btnUpload, btnScanWifi;
-    private String provider, latitude, longitude, gSsid, gRssi;
+    private TextView txtKoodinatNow, txtRssi, txtSsid, txtAutoStatus;
+    private Button btnCariLokasiNow, btnUpload, btnScanWifi, btnAutoUpload;
+    private String provider, latitude, longitude, gSsid, gRssi, autoStatus;
     private LocationManager locationManager;
     private WifiManager wifiManager;
     private WifiInfo info;
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayList<String[]> arrayList2 = new ArrayList<String[]>();
     private ArrayAdapter adapter;
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +75,15 @@ public class MainActivity extends AppCompatActivity
         txtKoodinatNow = (TextView) findViewById(R.id.txtKoordinatNow);
         txtRssi = (TextView) findViewById(R.id.txtRSSI);
         txtSsid = (TextView) findViewById(R.id.txtSSID);
+        txtAutoStatus = (TextView) findViewById(R.id.txtAutoStatus);
         progressDialog = new ProgressDialog(MainActivity.this);
 
-
+        //definisi button
         btnCariLokasiNow = (Button) findViewById(R.id.btnCariLokasiNow);
         btnUpload = (Button) findViewById(R.id.btnUpload);
         btnScanWifi = (Button) findViewById(R.id.btnScanWifi);
+        btnAutoUpload = (Button) findViewById(R.id.btnAutoUpload);
+
         //pendefinisian location manager
         locationManager = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
@@ -130,6 +139,34 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        autoStatus = "off";
+        txtAutoStatus.setText(autoStatus);
+
+//        MENCOBA FUNGSI PENGULANGAN OTOMATIS SAAT TOMBOL ON OFF DITEKAN
+//        Runnable helloRunnable = Toast.makeText(getApplicationContext(), "halo", Toast.LENGTH_SHORT)::show;
+//        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+//        Future<?> future = executor.scheduleAtFixedRate(helloRunnable, 0, 3, TimeUnit.SECONDS);
+
+        btnAutoUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if( autoStatus == "off"){
+                    mToastRunnable.run();
+                    autoStatus = "on";
+                    txtAutoStatus.setText(autoStatus);
+
+
+                } else if(autoStatus == "on"){
+                    mHandler.removeCallbacks(mToastRunnable);
+                    autoStatus = "off";
+                    txtAutoStatus.setText(autoStatus);
+                }
+            }
+        });
+
+
+
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(adapter);
         scanWifi();
@@ -166,6 +203,25 @@ public class MainActivity extends AppCompatActivity
 
 
 
+    }
+    private Runnable mToastRunnable = new Runnable() {
+        @Override
+        public void run() {
+            scanWifi();
+            mHandler.postDelayed(this,10000);
+        }
+    };
+
+    public void waitt(int ms)
+    {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public void insertToDatabase(final String ssid, final String rssi, final String lat, final String longitude){
