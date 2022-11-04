@@ -53,7 +53,8 @@ public class MainActivity extends AppCompatActivity
 
     private TextView txtKoodinatNow, txtRssi, txtSsid, txtAutoStatus;
     private Button btnCariLokasiNow, btnUpload, btnScanWifi, btnAutoUpload;
-    private String provider, latitude, longitude, gSsid, gRssi, autoStatus;
+    private String provider, latitude, longitude, gSsid, gRssi, autoStatus, string2, string1;
+    private int resultsI, resultsJ;
     private LocationManager locationManager;
     private WifiManager wifiManager;
     private WifiInfo info;
@@ -65,11 +66,14 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<String[]> arrayList2 = new ArrayList<String[]>();
     private ArrayAdapter adapter;
     private Handler mHandler = new Handler();
+    private Toast t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        string2 = "";
 
         //definisi dari inisialisasi
         txtKoodinatNow = (TextView) findViewById(R.id.txtKoordinatNow);
@@ -95,7 +99,8 @@ public class MainActivity extends AppCompatActivity
         listView = findViewById(R.id.wifiList);
 
         if (!wifiManager.isWifiEnabled()) {
-            Toast.makeText(this, "WiFI is Disabled.. We need to enable it", Toast.LENGTH_LONG).show();
+            t = Toast.makeText(this, "WiFI is Disabled.. We need to enable it", Toast.LENGTH_LONG);
+            t.show();
             wifiManager.setWifiEnabled(true);
 
         }
@@ -136,6 +141,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 scanWifi();
+
             }
         });
 
@@ -152,13 +158,13 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
 
                 if( autoStatus == "off"){
-                    mToastRunnable.run();
+//                    mToastRunnable.run();
                     autoStatus = "on";
                     txtAutoStatus.setText(autoStatus);
 
 
                 } else if(autoStatus == "on"){
-                    mHandler.removeCallbacks(mToastRunnable);
+//                    mHandler.removeCallbacks(mToastRunnable);
                     autoStatus = "off";
                     txtAutoStatus.setText(autoStatus);
                 }
@@ -169,7 +175,6 @@ public class MainActivity extends AppCompatActivity
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(adapter);
-        scanWifi();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -201,14 +206,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-
     }
     private Runnable mToastRunnable = new Runnable() {
         @Override
         public void run() {
             scanWifi();
-            mHandler.postDelayed(this,10000);
+            mHandler.postDelayed(this,5000);
         }
     };
 
@@ -235,9 +238,14 @@ public class MainActivity extends AppCompatActivity
                             try {
                                 String resp;
                                 resp = response;
-                                Toast.makeText(getApplicationContext(),resp, Toast.LENGTH_LONG).show();
+                                t.cancel();
+                                t = Toast.makeText(getApplicationContext(),resp, Toast.LENGTH_LONG);
+                                t.show();
                                 JSONObject jsonObject = new JSONObject(response);
                                 resp = jsonObject.getString("server");
+                                if( autoStatus == "on"){
+                                    scanWifi();
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
 
@@ -330,10 +338,15 @@ public class MainActivity extends AppCompatActivity
 
     private void scanWifi() {
         arrayList.clear();
-        arrayList2.clear()  ;
+        arrayList2.clear();
         registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiManager.startScan();
-        Toast.makeText(this, "Scanning Wifi . . .", Toast.LENGTH_SHORT).show();
+        if (t != null){
+            t.cancel();
+        }
+        t = Toast.makeText(this, "Scanning Wifi . . .", Toast.LENGTH_SHORT);
+        t.show();
+
     };
 
 
@@ -341,7 +354,10 @@ public class MainActivity extends AppCompatActivity
     BroadcastReceiver wifiReciever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            string2 = "";
+            resultsI = 1;
             results = wifiManager.getScanResults();
+            resultsJ = results.size() + 1;
             unregisterReceiver(this);
 
             for (ScanResult scanResult : results){
@@ -351,8 +367,16 @@ public class MainActivity extends AppCompatActivity
                 String hasil[] = {ssid,rssi};
                 arrayList2.add(hasil);
                 arrayList.add(scanResult.SSID + "  (" + scanResult.level + ")");
-                insertToDatabase(ssid,rssi,latitude,longitude);
+//                insertToDatabase(ssid,rssi,latitude,longitude);
                 adapter.notifyDataSetChanged();
+
+                string1 = "('"+ssid+"','"+rssi+"','"+latitude+"','"+longitude+"'),";
+                string2 = string2 + string1;
+                resultsI = resultsI + 1;
+                if (resultsI == resultsJ){
+                    insertToDatabase(string2,"1","1","1");
+                };
+
             }
         }
     };
